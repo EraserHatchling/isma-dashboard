@@ -7,11 +7,12 @@
 	async function register() {
 		const { error } = await supabase.auth.signUp({
 			email,
-			password
+			passwor
 		});
 
 		if (error) alert(error.message); // alert if error
 	}
+	async 
 </script>
 
 <div class="card mt-5 m-auto text-center" style="width: 24em;">
