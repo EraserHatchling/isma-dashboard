@@ -233,6 +233,9 @@ import { intros } from 'svelte/internal';
 		curPeriod = period
 		curStyle = style
 	}
+	function deleteTimeSlot (day, index){
+		
+	}
 </script>
 <h1>My Dashboard</h1>
 <h5>My school timetable</h5>
