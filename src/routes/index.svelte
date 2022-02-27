@@ -234,8 +234,27 @@ import { intros } from 'svelte/internal';
 		curStyle = style
 	}
 	function deleteTimeSlot (day, index){
-		
+	if (day === "Monday") {
+  	timetable.Monday.splice(index, 1);
+  	timetable = timetable;
 	}
+	else if (day === "Tuesday") {
+  	timetable.Tuesday.splice(index, 1);
+  	timetable = timetable;
+	}
+	else if (day === "Wednesday") {
+  	timetable.Wednesday.splice(index, 1);
+  	timetable = timetable;
+	}
+	else if (day === "Thursday") {
+  	timetable.Thursday.splice(index, 1);
+  	timetable = timetable;
+	}
+	else {
+  	timetable.Friday.splice(index, 1);
+  	timetable = timetable;
+	}
+}
 </script>
 <h1>My Dashboard</h1>
 <h5>My school timetable</h5>
@@ -374,6 +393,7 @@ import { intros } from 'svelte/internal';
 		</div>
 		<div class="modal-footer">
 		  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+		  <button type="button" class="btn btn-danger"  data-bs-dismiss="modal" on:click={() => deleteTimeSlot(curDay,curIndex)}>Delete</button>
 		  <button type="button" class="btn btn-primary">Save changes</button>
 		</div>
 	  </div>
