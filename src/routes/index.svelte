@@ -1,21 +1,12 @@
 <script>
     import supabase from '$lib/db';
-import { intros } from 'svelte/internal';
 
     async function signOut() {
    	 const { error } = await supabase.auth.signOut();
 
    	 if (error) alert(error.message); // alert if error
     }
-
-    // Select entries
-    async function getEntries() {
-   	 const { data, error } = await supabase.from('moodEntries').select();
-   	 if (error) alert(error.message);
-
-   	 return data;
-    }
-    let timetable = {
+	let timetable = {
 	Monday: [
   	{
     	name: "PH",
@@ -189,16 +180,10 @@ import { intros } from 'svelte/internal';
   };
     function addTimeSlot(day) {
 		if(day=="Monday"){
-			  timetable.Monday = [
-    ...timetable.Monday,
-    { name: "??", period: 1, style: "" }
-  ];
+			  timetable.Monday = [...timetable.Monday,{ name: "??", period: 1, style: "" }];
 		}
 		else if(day=="Tuesday"){
-			timetable.Tuesday = [
-    ...timetable.Tuesday,
-    { name: "??", period: 1, style: "" }
-  ];
+			timetable.Tuesday = [...timetable.Tuesday,{ name: "??", period: 1, style: "" }];
 		}
 		else if(day=="Wednesday"){
 			timetable.Wednesday = [
@@ -219,7 +204,28 @@ import { intros } from 'svelte/internal';
   ];
 		}
 	}
+    // Select entries
+    async function getEntries() {
+   	 const { data, error } = await supabase.from('studentEntries').select();
+   	 if (error) alert(error.message);
 
+   	 if (data != "") {
+    timetable = data[0].timetable;
+  }
+    }
+	getEntries();
+	
+	async function saveEntry() {
+		const { error } = await supabase.from("studentEntries").upsert(
+		{
+			user_id: supabase.auth.user().id,
+			timetable: timetable,
+			},
+			{ onConflict: "user_id" }
+		);
+  		if (error) alert(error.message);
+	}
+  
 	let	curDay
 	let curIndex
 	let curName
@@ -234,27 +240,54 @@ import { intros } from 'svelte/internal';
 		curStyle = style
 	}
 	function deleteTimeSlot (day, index){
-	if (day === "Monday") {
-  	timetable.Monday.splice(index, 1);
-  	timetable = timetable;
+		if (day === "Monday") {
+		timetable.Monday.splice(index, 1);
+		timetable = timetable;
+		}
+		else if (day === "Tuesday") {
+		timetable.Tuesday.splice(index, 1);
+		timetable = timetable;
+		}
+		else if (day === "Wednesday") {
+		timetable.Wednesday.splice(index, 1);
+		timetable = timetable;
+		}
+		else if (day === "Thursday") {
+		timetable.Thursday.splice(index, 1);
+		timetable = timetable;
+		}
+		else {
+		timetable.Friday.splice(index, 1);
+		timetable = timetable;
+		}
+
+		saveEntry();
 	}
-	else if (day === "Tuesday") {
-  	timetable.Tuesday.splice(index, 1);
-  	timetable = timetable;
+
+	function setTimeSlot(day,index,newName,newPeriod,newStyle){
+		if (day === "Monday") {
+  	timetable.Monday[index].name = newName;
+  	timetable.Monday[index].period = newPeriod;
+  	timetable.Monday[index].style = newStyle;
+	} else if (day === "Tuesday") {
+  	timetable.Tuesday[index].name = newName;
+  	timetable.Tuesday[index].period = newPeriod;
+  	timetable.Tuesday[index].style = newStyle;
+	} else if (day === "Wednesday") {
+  	timetable.Wednesday[index].name = newName;
+  	timetable.Wednesday[index].period = newPeriod;
+  	timetable.Wednesday[index].style = newStyle;
+	} else if (day === "Thursday") {
+  	timetable.Thursday[index].name = newName;
+  	timetable.Thursday[index].period = newPeriod;
+  	timetable.Thursday[index].style = newStyle;
+	} else if (day === "Friday") {
+  	timetable.Friday[index].name = newName;
+  	timetable.Friday[index].period = newPeriod;
+  	timetable.Friday[index].style = newStyle;
 	}
-	else if (day === "Wednesday") {
-  	timetable.Wednesday.splice(index, 1);
-  	timetable = timetable;
+	saveEntry();
 	}
-	else if (day === "Thursday") {
-  	timetable.Thursday.splice(index, 1);
-  	timetable = timetable;
-	}
-	else {
-  	timetable.Friday.splice(index, 1);
-  	timetable = timetable;
-	}
-}
 </script>
 <h1>My Dashboard</h1>
 <h5>My school timetable</h5>
@@ -394,7 +427,7 @@ import { intros } from 'svelte/internal';
 		<div class="modal-footer">
 		  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 		  <button type="button" class="btn btn-danger"  data-bs-dismiss="modal" on:click={() => deleteTimeSlot(curDay,curIndex)}>Delete</button>
-		  <button type="button" class="btn btn-primary">Save changes</button>
+		  <button type="button" class="btn btn-primary" on:click={()=>{setTimeSlot(curDay, curIndex, curName, curPeriod, curStyle)}} >Save changes</button>
 		</div>
 	  </div>
 	</div>
